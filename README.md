@@ -4,11 +4,11 @@
 - コード全体の雛形は[WaveGANをpytorchで実装したもの[github]](https://github.com/mazzzystar/WaveGAN-pytorch)の書き方を参照
 
 ## ファイル構成
-── Model名（LSTMなど）
-    ├── tarin.py(学習の流れ全般のコード．どのコードもこのファイルをコンパイルすることで実行できる)
-    ├── Model名.py(モデルの構造に関するコード)
-    ├── utils.py(データ処理周りに関するコード)
-    ├── config.py(バッチサイズや，モデルサイズ等のよく変える設定を記述したコード)
-    ├── logger.py（ログに関するコード）
-    └── README.md
+── Model名（LSTMなど）  
+    ├── tarin.py(学習の流れ全般のコード．どのコードもこのファイルをコンパイルすることで実行できる)  
+    ├── Model名.py(モデルの構造に関するコード)  
+    ├── utils.py(データ処理周りに関するコード)  
+    ├── config.py(バッチサイズや，モデルサイズ等のよく変える設定を記述したコード)  
+    ├── logger.py（ログに関するコード）  
+    └── README.md  
     
