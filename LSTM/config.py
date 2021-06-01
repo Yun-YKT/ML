@@ -1,7 +1,6 @@
 # Training
-EPOCHS = 50
-BATCH_SIZE = 32
+EPOCHS = 1000
+BATCH_SIZE = 100
 
 # Data
-DATASET_NAME = ''
 OUTPUT_PATH = "output/"
