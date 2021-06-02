@@ -1,4 +1,3 @@
-from LSTM.lstm import LSTM
 import os
 import pickle
 import numpy as np
@@ -10,6 +9,7 @@ import torch.nn as nn
 from  torch.utils.data import DataLoader
 from torch import autograd
 from torch import optim
+from torch.optim import SGD
 
 import time
 import pprint
@@ -47,11 +47,13 @@ output_dir = args['output_dir']
 training_size = 10000
 test_size = 1000
 hiddenlayer_size = 5
-model = LSTM(model_size = model_size, batch_size = batch_size, hidden_layer_size = hiddenlayer_size)
-if cuda:
-    model = torch.nn.DataParallel(model).cuda()
+#model = LSTM(model_size = model_size, batch_size = batch_size, hidden_layer_size = hiddenlayer_size)
+model = LSTM(1, hiddenlayer_size, 1)
+#if cuda:
+    #model = torch.nn.DataParallel(model).cuda()
 loss_function = nn.MSELoss()
-optimizer_lstm = optim.Adam(model.parameters(), lr=args['learning_rate'], betas=(args['beta1'], args['beta2']))
+#optimizer_lstm = optim.Adam(model.parameters(), lr=args['learning_rate'], betas=(args['beta1'], args['beta2']))
+optimizer_lstm = SGD(model.parameters(), lr=0.01)
 
 train_x, train_t = mkDataSet(training_size)
 test_x, test_t = mkDataSet(test_size)
@@ -62,7 +64,7 @@ start = time.time()
 loss_train_history = []
 loss_test_history = []
 
-LOGGER.info('Starting training...EPOCHS={}, BATCH_SIZE={}, BATCH_NUM={}'.format(epochs, batch_size, BATCH_NUM))
+LOGGER.info('Starting training...EPOCHS={}, BATCH_SIZE={}'.format(epochs, batch_size))
 for epoch in range(1, epochs+1):
     LOGGER.info("{} Epoch: {}/{}".format(time_since(start), epoch, epochs))
     loss_train_epoch = []
@@ -70,12 +72,17 @@ for epoch in range(1, epochs+1):
         optimizer_lstm.zero_grad()
 
         data, label = mkRandomBatch(train_x, train_t, batch_size)
-
+        if cuda:
+            data = data.cuda()
         output = model(data)
 
         loss = loss_function(output, label)
-        loss.backward()
+        loss.backward(retain_graph=True)
         optimizer_lstm.step()
+
+        if cuda:
+            loss = loss.cpu()
+
         loss_train_epoch.append(loss.data.numpy())
 
     loss_train_epoch_avg = sum(loss_train_epoch) / float(len(loss_train_epoch))
@@ -86,8 +93,13 @@ for epoch in range(1, epochs+1):
     for i in range(int(test_size / batch_size)):
         offset = i * batch_size
         data, label = torch.tensor(test_x[offset:offset+batch_size]), torch.tensor(test_t[offset:offset+batch_size])
+
+        if cuda:
+            data = data.cuda()
         output = model(data, None)
         loss = loss_function(output, label)
+        if cuda:
+            loss = loss.cpu()
         loss_test_epoch.append(loss.data.numpy())
 
     loss_test_epoch_avg = sum(loss_test_epoch) / float(len(loss_test_epoch))

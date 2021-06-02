@@ -5,6 +5,7 @@ import torch
 import logging
 import argparse
 from config import *
+import numpy as np
 import matplotlib
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
